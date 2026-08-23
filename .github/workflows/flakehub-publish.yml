@@ -30,6 +30,6 @@ jobs:
             experimental-features = nix-command flakes
       - uses: DeterminateSystems/flakehub-push@v6
         with:
-          name: ismailkattakath/nix-mcp-gateway
+          name: kattakath/nix-mcp-gateway
           visibility: public
           rolling: true
