@@ -1,6 +1,6 @@
 # nix-mcp-gateway
 
-[![CI](https://github.com/ismailkattakath/nix-mcp-gateway/actions/workflows/ci.yml/badge.svg)](https://github.com/ismailkattakath/nix-mcp-gateway/actions/workflows/ci.yml)
+[![CI](https://github.com/kattakath/nix-mcp-gateway/actions/workflows/ci.yml/badge.svg)](https://github.com/kattakath/nix-mcp-gateway/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Built with Nix](https://img.shields.io/badge/built%20with-Nix-5277C3.svg?logo=nixos&logoColor=white)](https://nixos.org)
 
@@ -39,7 +39,7 @@ care where the command came from.
 
 ```nix
 {
-  inputs.mcp-gateway.url = "github:ismailkattakath/nix-mcp-gateway";
+  inputs.mcp-gateway.url = "github:kattakath/nix-mcp-gateway";
 
   # in your home-manager modules:
   #   mcp-gateway.homeManagerModules.default
