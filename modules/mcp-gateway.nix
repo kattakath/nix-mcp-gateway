@@ -194,7 +194,19 @@ in
         ];
         RunAtLoad = true;
         KeepAlive = true;
-        EnvironmentVariables.PATH = lib.makeBinPath cfg.extraPath + ":/usr/bin:/bin";
+        # Joined by FILTERING EMPTIES, not by string concatenation. With the
+        # default `extraPath = [ ]`, `lib.makeBinPath [ ]` is the empty string,
+        # so the old `lib.makeBinPath cfg.extraPath + ":/usr/bin:/bin"` produced
+        # a PATH with a LEADING EMPTY ELEMENT — which POSIX resolves as the
+        # CURRENT WORKING DIRECTORY. That put cwd on the search path of a
+        # long-running daemon whose whole job is launching other executables.
+        EnvironmentVariables.PATH = lib.concatStringsSep ":" (
+          lib.filter (p: p != "") [
+            (lib.makeBinPath cfg.extraPath)
+            "/usr/bin"
+            "/bin"
+          ]
+        );
         StandardOutPath = cfg.logFile;
         StandardErrorPath = cfg.logFile;
       };
