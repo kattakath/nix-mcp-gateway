@@ -22,8 +22,8 @@
 # which only exists while that uid has an active GUI login — so the account
 # running `home-manager switch` must be the one logged into the Mac.
 #
-# SECRETS: `servers.<name>.env` values land in the /nix/store-readable launchd
-# plist verbatim, which is world-readable on a multi-user Mac — so this option
+# SECRETS: `servers.<name>.env` values land verbatim in the generated mcp-proxy
+# JSON config, which lives in the world-readable /nix/store — so this option
 # is for non-secret configuration only. For a secret an MCP server needs at
 # launch (an API key, a database URI), wrap the real command in a script that
 # fetches the value at RUN time (e.g. from the macOS Keychain via

@@ -12,7 +12,8 @@ Claude Code, Claude Desktop, VS Code, a CLI — at the resulting endpoints
 instead of each spawning its own stdio copy of the same server.
 
 > Status: early / beta. macOS-only. Extracted from a personal nix-darwin
-> fleet where it hosts a dozen-odd servers behind one gateway.
+> fleet, which still runs its own in-tree copy — this flake is not yet
+> consumed as an input anywhere.
 
 ## What this is (and isn't)
 
@@ -121,12 +122,13 @@ wrap the real command in a script that fetches it at *run* time instead
 | Every client spawning its own process (no shared gateway) | your MCP client's native stdio config |
 | Public/off-box exposure with auth | put your own reverse proxy + auth in front — this module only binds loopback |
 
-## Used in production
+## Where it comes from
 
-See it wired into a real fleet in
-**[kattakath/nix-config](https://github.com/kattakath/nix-config)** —
-[`modules/shared/mcp.nix`](https://github.com/kattakath/nix-config/blob/main/modules/shared/mcp.nix)
-hosts a dozen-odd MCP servers behind one gateway on the `macos` host.
+Extracted from **[kattakath/nix-config](https://github.com/kattakath/nix-config)**,
+whose [`modules/shared/mcp.nix`](https://github.com/kattakath/nix-config/blob/main/modules/shared/mcp.nix)
+hosts a dozen-odd MCP servers behind one gateway on the `macos` host. That repo
+still carries its own in-tree copy of the module and does **not** consume this
+flake — adopting it as an input is not done yet.
 
 ## License
 
