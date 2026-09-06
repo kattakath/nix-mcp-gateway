@@ -33,10 +33,18 @@
       # treefmt owns `nix fmt` and supplies its own `checks.treefmt` gate, so CI
       # needs no hand-rolled formatting step — `nix flake check` runs the
       # formatter from THIS flake's lock rather than the runner's registry.
+      #
       # Bare nixfmt as the formatter is a trap: `nix fmt` hands it every file in
       # the tree, including README.md and LICENSE, which it cannot parse.
-      # This is a plain flake, so it takes treefmt-nix's non-flake-parts entry
-      # point: upstream option treefmt-nix.lib.evalModule exists -> using it.
+      # (Measured on a sibling repo before treefmt landed there: `nix fmt` on
+      # main failed outright with "unexpected end of input".)
+      #
+      # This is a plain flake, not flake-parts, so it takes the non-flake-parts
+      # entry point:
+      # upstream option treefmt-nix.lib.evalModule exists -> using it
+      # (treefmt-nix default.nix:129 `evalModule =`, re-exported as `lib` by its
+      # flake.nix:17 `lib = import ./.;`; the two outputs consumed below are
+      # `build.wrapper` module-options.nix:229 and `build.check` :305).
       treefmtEval = forAll darwinSystems (
         _: pkgs:
         treefmt-nix.lib.evalModule pkgs {
