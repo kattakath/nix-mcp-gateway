@@ -5,6 +5,8 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    treefmt-nix.url = "github:numtide/treefmt-nix";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   nixConfig = {
@@ -19,6 +21,7 @@
       self,
       nixpkgs,
       home-manager,
+      treefmt-nix,
     }:
     let
       inherit (nixpkgs) lib;
@@ -26,6 +29,24 @@
         "aarch64-darwin"
       ];
       forAll = systems: f: lib.genAttrs systems (system: f system nixpkgs.legacyPackages.${system});
+
+      # treefmt owns `nix fmt` AND supplies its own `checks.treefmt` gate, so CI
+      # formatting is just `nix flake check` against THIS flake's lock — no
+      # `nix run nixpkgs#nixfmt` reaching into the runner's registry for an
+      # unpinned formatter. This flake is a plain one, not flake-parts, so it
+      # takes the non-flake-parts entry point:
+      # upstream option treefmt-nix.lib.evalModule exists -> using it
+      # (treefmt-nix/default.nix:129, re-exported as `lib` by its flake.nix:17;
+      # `build.wrapper` module-options.nix:229, `build.check` :305).
+      treefmtEval = forAll darwinSystems (
+        _: pkgs:
+        treefmt-nix.lib.evalModule pkgs {
+          projectRootFile = "flake.nix";
+          programs.nixfmt.enable = true;
+          programs.deadnix.enable = true;
+          programs.statix.enable = true;
+        }
+      );
     in
     {
       # The reusable home-manager module (system-agnostic; no-op off macOS).
@@ -65,9 +86,11 @@
             grep -q '"demo"' "${lib.elemAt agent.ProgramArguments 6}"
             echo ok > "$out"
           '';
+
+          treefmt = treefmtEval.${system}.config.build.check self;
         }
       );
 
-      formatter = forAll darwinSystems (_: pkgs: pkgs.nixfmt-rfc-style);
+      formatter = forAll darwinSystems (system: _: treefmtEval.${system}.config.build.wrapper);
     };
 }
